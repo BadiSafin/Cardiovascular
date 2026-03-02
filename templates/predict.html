@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Risk Assessment - CardioPredict AI</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .assessment-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .form-label {
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .form-control {
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 12px 15px;
+            transition: all 0.3s;
+        }
+        
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.25rem rgba(102, 126, 234, 0.25);
+        }
+        
+        .btn-submit {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            transition: transform 0.3s;
+        }
+        
+        .btn-submit:hover {
+            transform: translateY(-2px);
+        }
+        
+        .result-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .risk-high {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+            color: white;
+        }
+        
+        .risk-medium {
+            background: linear-gradient(135deg, #ffd93d 0%, #ff9a3c 100%);
+            color: white;
+        }
+        
+        .risk-low {
+            background: linear-gradient(135deg, #6bcf7f 0%, #4cd137 100%);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-transparent">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-heartbeat me-2"></i>CardioPredict AI
+            </a>
+            <a href="/" class="btn btn-outline-light">
+                <i class="fas fa-home me-1"></i>Back to Home
+            </a>
+        </div>
+    </nav>
+
+    <!-- Assessment Form -->
+    <section class="py-5">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="assessment-card p-5">
+                        <h1 class="text-center mb-4">
+                            <i class="fas fa-stethoscope me-2"></i>Cardiovascular Risk Assessment
+                        </h1>
+                        <p class="text-center text-muted mb-5">
+                            Enter your health information for personalized risk analysis. All data is processed securely.
+                        </p>
+                        
+                        <form id="assessmentForm">
+                            <!-- Personal Information -->
+                            <div class="row mb-4">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">
+                                        <i class="fas fa-birthday-cake me-2 text-primary"></i>Age (years)
+                                    </label>
+                                    <input type="number" name="age" class="form-control" min="20" max="100" 
+                                           placeholder="Enter your age" required>
+                                    <div class="form-text">Age in years (20-100)</div>
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">
+                                        <i class="fas fa-ruler-vertical me-2 text-success"></i>Height (cm)
+                                    </label>
+                                    <input type="number" name="height" class="form-control" min="100" max="250" 
+                                           placeholder="Height in centimeters" required>
+                                    <div class="form-text">Height in centimeters</div>
+                                </div>
+                            </div>
+                            
+                            <!-- Weight and BMI -->
+                            <div class="row mb-4">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">
+                                        <i class="fas fa-weight me-2 text-warning"></i>Weight (kg)
+                                    </label>
+                                    <input type="number" name="weight" class="form-control" min="30" max="200" 
+                                           placeholder="Weight in kilograms" required>
+                                    <div class="form-text">Weight in kilograms</div>
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">
+                                        <i class="fas fa-calculator me-2 text-info"></i>BMI Calculator
+                                    </label>
+                                    <div class="input-group">
+                                        <input type="text" id="bmiResult" class="form-control" readonly 
+                                               placeholder="BMI will be calculated automatically">
+                                        <span class="input-group-text">kg/m²</span>
+                                    </div>
+                                    <div class="form-text">Body Mass Index (calculated from height & weight)</div>
+                                </div>
+                            </div>
+                            
+                            <!-- Blood Pressure -->
+                            <div class="row mb-4">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">
+                                        <i class="fas fa-heartbeat me-2 text-danger"></i>Systolic BP (mmHg)
+                                    </label>
+                                    <input type="number" name="ap_hi" class="form-control" min="80" max="250" 
+                                           placeholder="Upper blood pressure" required>
+                                    <div class="form-text">Systolic blood pressure (normal: < 120 mmHg)</div>
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">
+                                        <i class="fas fa-heartbeat me-2 text-primary"></i>Diastolic BP (mmHg)
+                                    </label>
+                                    <input type="number" name="ap_lo" class="form-control" min="50" max="150" 
+                                           placeholder="Lower blood pressure" required>
+                                    <div class="form-text">Diastolic blood pressure (normal: < 80 mmHg)</div>
+                                </div>
+                            </div>
+                            
+                            <!-- Health Metrics -->
+                            <div class="row mb-4">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">
+                                        <i class="fas fa-vial me-2 text-warning"></i>Cholesterol Level
+                                    </label>
+                                    <select name="cholesterol" class="form-select" required>
+                                        <option value="">Select cholesterol level</option>
+                                        <option value="1">Normal</option>
+                                        <option value="2">Above Normal</option>
+                                        <option value="3">Well Above Normal</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">
+                                        <i class="fas fa-syringe me-2 text-success"></i>Glucose Level
+                                    </label>
+                                    <select name="gluc" class="form-select" required>
+                                        <option value="">Select glucose level</option>
+                                        <option value="1">Normal</option>
+                                        <option value="2">Above Normal</option>
+                                        <option value="3">Well Above Normal</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <!-- Lifestyle Factors -->
+                            <div class="row mb-5">
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">
+                                        <i class="fas fa-smoking me-2 text-secondary"></i>Smoking
+                                    </label>
+                                    <select name="smoke" class="form-select">
+                                        <option value="0">No</option>
+                                        <option value="1">Yes</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">
+                                        <i class="fas fa-wine-glass-alt me-2 text-purple"></i>Alcohol
+                                    </label>
+                                    <select name="alco" class="form-select">
+                                        <option value="0">No</option>
+                                        <option value="1">Yes</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">
+                                        <i class="fas fa-running me-2 text-info"></i>Physical Activity
+                                    </label>
+                                    <select name="active" class="form-select">
+                                        <option value="1">Active</option>
+                                        <option value="0">Not Active</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <!-- Submit Button -->
+                            <div class="text-center">
+                                <button type="submit" class="btn btn-submit w-100">
+                                    <i class="fas fa-brain me-2"></i>Analyze Cardiovascular Risk
+                                </button>
+                            </div>
+                        </form>
+                        
+                        <!-- Results Section -->
+                        <div id="resultsSection" class="result-card" style="display: none;">
+                            <div class="text-center mb-4">
+                                <div id="riskIcon" class="display-4 mb-3"></div>
+                                <h2 id="riskTitle" class="mb-3"></h2>
+                                <span id="riskBadge" class="badge risk-badge px-4 py-2 fs-5"></span>
+                            </div>
+                            
+                            <div class="row mb-4">
+                                <div class="col-md-6">
+                                    <div class="card border-0 bg-light p-3">
+                                        <div class="text-muted mb-2">Risk Probability</div>
+                                        <div id="probabilityValue" class="display-6 fw-bold"></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card border-0 bg-light p-3">
+                                        <div class="text-muted mb-2">BMI</div>
+                                        <div id="bmiValue" class="display-6 fw-bold"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div id="recommendationsList" class="mb-4"></div>
+                            
+                            <div class="text-center">
+                                <button onclick="resetForm()" class="btn btn-outline-primary me-3">
+                                    <i class="fas fa-redo me-1"></i>New Assessment
+                                </button>
+                                <a href="/analytics" class="btn btn-primary">
+                                    <i class="fas fa-chart-line me-1"></i>View Analytics
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <!-- Loading Spinner -->
+                        <div id="loadingSpinner" class="text-center mt-4" style="display: none;">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <p class="mt-2">Analyzing your health data...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-4">
+        <div class="container">
+            <p class="text-center mb-0">© 2024 CardioPredict AI. For educational purposes only. Consult healthcare professionals for medical advice.</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JavaScript -->
+    <script>
+        // Calculate BMI in real-time
+        document.addEventListener('DOMContentLoaded', function() {
+            const heightInput = document.querySelector('input[name="height"]');
+            const weightInput = document.querySelector('input[name="weight"]');
+            const bmiResult = document.getElementById('bmiResult');
+            
+            function calculateBMI() {
+                const height = parseFloat(heightInput.value) / 100; // Convert to meters
+                const weight = parseFloat(weightInput.value);
+                
+                if (height && weight && height > 0) {
+                    const bmi = (weight / (height * height)).toFixed(1);
+                    bmiResult.value = bmi;
+                }
+            }
+            
+            heightInput.addEventListener('input', calculateBMI);
+            weightInput.addEventListener('input', calculateBMI);
+        });
+        
+        // Handle form submission
+        document.getElementById('assessmentForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const form = e.target;
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const resultsSection = document.getElementById('resultsSection');
+            const loadingSpinner = document.getElementById('loadingSpinner');
+            
+            // Show loading spinner
+            submitBtn.disabled = true;
+            loadingSpinner.style.display = 'block';
+            resultsSection.style.display = 'none';
+            
+            try {
+                const formData = new FormData(form);
+                
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Update UI with results
+                    updateResultsUI(result);
+                    resultsSection.style.display = 'block';
+                    
+                    // Smooth scroll to results
+                    resultsSection.scrollIntoView({ behavior: 'smooth' });
+                } else {
+                    alert('Error: ' + result.error);
+                }
+            } catch (error) {
+                alert('Error: Could not process your request. Please try again.');
+                console.error('Form submission error:', error);
+            } finally {
+                // Hide loading spinner
+                submitBtn.disabled = false;
+                loadingSpinner.style.display = 'none';
+            }
+        });
+        
+        function updateResultsUI(result) {
+            // Set risk level and color
+            const riskTitle = document.getElementById('riskTitle');
+            const riskBadge = document.getElementById('riskBadge');
+            const riskIcon = document.getElementById('riskIcon');
+            const probabilityValue = document.getElementById('probabilityValue');
+            const bmiValue = document.getElementById('bmiValue');
+            const recommendationsList = document.getElementById('recommendationsList');
+            
+            // Set values
+            riskTitle.textContent = result.prediction === 1 ? 'Disease Risk Detected' : 'Healthy Profile';
+            probabilityValue.textContent = result.probability + '%';
+            bmiValue.textContent = result.bmi;
+            
+            // Set risk level styling
+            let riskClass = '';
+            let icon = '';
+            
+            if (result.risk_level === 'High Risk') {
+                riskClass = 'risk-high';
+                icon = '🔴';
+            } else if (result.risk_level === 'Medium Risk') {
+                riskClass = 'risk-medium';
+                icon = '🟡';
+            } else {
+                riskClass = 'risk-low';
+                icon = '🟢';
+            }
+            
+            riskBadge.textContent = result.risk_level;
+            riskBadge.className = `badge ${riskClass} px-4 py-2 fs-5`;
+            riskIcon.textContent = icon;
+            
+            // Add recommendations
+            recommendationsList.innerHTML = `
+                <h5 class="mb-3"><i class="fas fa-lightbulb me-2"></i>Recommendations</h5>
+                <ul class="list-group">
+                    ${result.recommendations.map(rec => `
+                        <li class="list-group-item border-0">
+                            <i class="fas fa-check-circle me-2 text-success"></i>${rec}
+                        </li>
+                    `).join('')}
+                </ul>
+            `;
+        }
+        
+        function resetForm() {
+            document.getElementById('assessmentForm').reset();
+            document.getElementById('bmiResult').value = '';
+            document.getElementById('resultsSection').style.display = 'none';
+            
+            // Scroll to top of form
+            document.querySelector('.assessment-card').scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>

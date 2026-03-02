@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics Dashboard - CardioPredict AI</title>
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .dashboard-card {
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+        }
+        .stat-card {
+            text-align: center;
+            padding: 20px;
+            border-radius: 10px;
+            color: white;
+            margin-bottom: 20px;
+        }
+        .stat-card i {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-heartbeat"></i> CardioPredict AI
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/predict">Risk Assessment</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/analytics">Analytics</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Analytics Dashboard -->
+    <div class="container-fluid py-4">
+        <h1 class="mb-4"><i class="fas fa-chart-line me-2"></i>Analytics Dashboard</h1>
+        
+        <!-- Statistics Cards -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="stat-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    <i class="fas fa-users"></i>
+                    <div class="stat-value" id="totalPredictions">0</div>
+                    <div class="stat-label">Total Assessments</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                    <i class="fas fa-heartbeat"></i>
+                    <div class="stat-value" id="avgRisk">0%</div>
+                    <div class="stat-label">Average Risk</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <div class="stat-value" id="highRiskCount">0</div>
+                    <div class="stat-label">High Risk Cases</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                    <i class="fas fa-bolt"></i>
+                    <div class="stat-value" id="modelAccuracy">0%</div>
+                    <div class="stat-label">Model Accuracy</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Charts Row 1 -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="card dashboard-card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="fas fa-chart-pie me-2"></i>Risk Distribution</h5>
+                        <canvas id="riskDistributionChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card dashboard-card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="fas fa-chart-bar me-2"></i>Age vs Risk Correlation</h5>
+                        <canvas id="ageRiskChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Charts Row 2 -->
+        <div class="row mb-4">
+            <div class="col-md-8">
+                <div class="card dashboard-card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="fas fa-weight me-2"></i>BMI Distribution Analysis</h5>
+                        <canvas id="bmiDistributionChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card dashboard-card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="fas fa-heart me-2"></i>Blood Pressure Stats</h5>
+                        <div class="text-center mb-3">
+                            <div class="display-4 text-primary" id="avgSystolicBP">120</div>
+                            <div class="text-muted">Avg Systolic BP</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="display-4 text-success" id="avgDiastolicBP">80</div>
+                            <div class="text-muted">Avg Diastolic BP</div>
+                        </div>
+                        <hr>
+                        <h6>BP Categories:</h6>
+                        <div class="progress mb-2">
+                            <div class="progress-bar bg-success" style="width: 60%">Normal (60%)</div>
+                        </div>
+                        <div class="progress mb-2">
+                            <div class="progress-bar bg-warning" style="width: 25%">Elevated (25%)</div>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar bg-danger" style="width: 15%">High (15%)</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Feature Importance -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card dashboard-card">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="fas fa-star me-2"></i>Feature Importance</h5>
+                        <canvas id="featureImportanceChart"></canvas>
+                        <p class="text-muted mt-3">
+                            <small>This shows which factors most influence cardiovascular risk predictions.</small>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Dashboard JavaScript -->
+    <script>
+        // Animate statistics counters
+        function animateValue(id, start, end, duration, suffix = '') {
+            const obj = document.getElementById(id);
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                const value = Math.floor(progress * (end - start) + start);
+                obj.innerHTML = value + suffix;
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                }
+            };
+            window.requestAnimationFrame(step);
+        }
+
+        // Initialize statistics
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animate counters
+            animateValue('totalPredictions', 0, 1250, 2000);
+            animateValue('avgRisk', 0, 42, 2000, '%');
+            animateValue('highRiskCount', 0, 187, 2000);
+            animateValue('modelAccuracy', 0, 92, 2000, '%');
+            
+            // Risk Distribution Chart
+            const riskCtx = document.getElementById('riskDistributionChart').getContext('2d');
+            const riskChart = new Chart(riskCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Low Risk', 'Medium Risk', 'High Risk'],
+                    datasets: [{
+                        data: [45, 35, 20],
+                        backgroundColor: ['#4CAF50', '#FFC107', '#F44336'],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+            
+            // Age vs Risk Chart
+            const ageCtx = document.getElementById('ageRiskChart').getContext('2d');
+            const ageChart = new Chart(ageCtx, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: 'Age vs Risk',
+                        data: [
+                            {x: 25, y: 15},
+                            {x: 30, y: 20},
+                            {x: 35, y: 25},
+                            {x: 40, y: 35},
+                            {x: 45, y: 45},
+                            {x: 50, y: 55},
+                            {x: 55, y: 65},
+                            {x: 60, y: 75},
+                            {x: 65, y: 85}
+                        ],
+                        backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Age (years)'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Risk Probability (%)'
+                            },
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+            
+            // BMI Distribution Chart
+            const bmiCtx = document.getElementById('bmiDistributionChart').getContext('2d');
+            const bmiChart = new Chart(bmiCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Underweight', 'Normal', 'Overweight', 'Obese'],
+                    datasets: [{
+                        label: 'Number of Cases',
+                        data: [50, 350, 280, 120],
+                        backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0'],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Number of Cases'
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Feature Importance Chart
+            const featureCtx = document.getElementById('featureImportanceChart').getContext('2d');
+            const featureChart = new Chart(featureCtx, {
+                type: 'horizontalBar',
+                data: {
+                    labels: ['Age', 'Systolic BP', 'Cholesterol', 'BMI', 'Diastolic BP', 'Glucose', 'Smoking', 'Alcohol', 'Activity'],
+                    datasets: [{
+                        label: 'Importance Score',
+                        data: [0.25, 0.22, 0.18, 0.15, 0.12, 0.08, 0.05, 0.03, 0.02],
+                        backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            max: 0.3
+                        }
+                    }
+                }
+            });
+            
+            // Update BP stats
+            setTimeout(() => {
+                document.getElementById('avgSystolicBP').textContent = '128';
+                document.getElementById('avgDiastolicBP').textContent = '82';
+            }, 1000);
+        });
+        
+        // Refresh data every 30 seconds (simulated)
+        setInterval(() => {
+            // In real implementation, this would fetch new data from API
+            console.log('Refreshing dashboard data...');
+        }, 30000);
+    </script>
+</body>
+</html>
